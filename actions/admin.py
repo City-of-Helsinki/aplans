@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
+
 from ordered_model.admin import OrderedTabularInline, OrderedInlineModelAdminMixin, \
     OrderedModelAdmin
 from django_summernote.admin import SummernoteModelAdmin
@@ -76,17 +78,16 @@ class ActionAdmin(ImageCroppingMixin, OrderedModelAdmin, SummernoteModelAdmin):
     autocomplete_fields = ('contact_persons',)
 
     fieldsets = (
-        (None, {
+        (_('Basic information'), {
             'fields': (
                 'plan', 'identifier', 'official_name', 'name', 'description',
                 'categories', 'contact_persons', 'image', 'image_cropping',
-            )
+                'schedule', 'decision_level',
+            ),
+            'classes': ('baton-tabs-init', 'baton-tab-inline-tasks',)
         }),
         (None, {
             'fields': ('status', 'completion')
-        }),
-        (None, {
-            'fields': ('schedule', 'decision_level')
         }),
     )
 

@@ -54,6 +54,7 @@ SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
+    'baton',
     'helusers',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -78,6 +79,7 @@ INSTALLED_APPS = [
     'actions',
     'indicators',
     'people',
+    'baton.autodiscover',
 ]
 
 MIDDLEWARE = [

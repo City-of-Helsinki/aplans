@@ -15,8 +15,8 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib import admin
 from django.urls import path, include
+from baton.autodiscover import admin
 from rest_framework import routers
 
 from actions.api import all_views as actions_api_views
@@ -31,6 +31,7 @@ for view in actions_api_views + indicators_api_views + insight_api_views:
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('baton/', include('baton.urls')),
     path('summernote/', include('django_summernote.urls')),
     path('v1/', include(router.urls)),
     path('', include('social_django.urls', namespace='social'))
