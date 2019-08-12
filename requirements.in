@@ -26,3 +26,4 @@ pytest-cov
 graphene-django
 graphene-django-optimizer
 aniso8601
+wagtail

@@ -10,6 +10,15 @@ from ordered_model.models import OrderedModel
 from aplans.utils import IdentifierField
 from aplans.model_images import ModelWithImage
 
+from wagtail.core.fields import RichTextField
+from wagtail.admin.edit_handlers import FieldPanel, InlinePanel
+from wagtail.core.models import Orderable
+
+from wagtailautocomplete.edit_handlers import AutocompletePanel
+
+from modelcluster.models import ClusterableModel
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
+
 
 User = get_user_model()
 
@@ -49,7 +58,7 @@ def latest_plan():
         return None
 
 
-class Action(ModelWithImage, OrderedModel):
+class Action(ModelWithImage, OrderedModel, ClusterableModel):
     plan = models.ForeignKey(
         Plan, on_delete=models.CASCADE, default=latest_plan, related_name='actions',
         verbose_name=_('plan')
@@ -63,10 +72,11 @@ class Action(ModelWithImage, OrderedModel):
     identifier = IdentifierField(
         help_text=_('The identifier for this action (e.g. number)')
     )
-    description = models.TextField(
-        null=True, blank=True,
+    description = RichTextField(
         verbose_name=_('description'),
-        help_text=_('What does this action involve in more detail?'))
+        help_text=_('What does this action involve in more detail?'),
+        default='',
+    )
     impact = models.IntegerField(
         null=True, blank=True,
         verbose_name=_('impact'),
@@ -88,7 +98,7 @@ class Action(ModelWithImage, OrderedModel):
         'ActionDecisionLevel', blank=True, null=True, related_name='actions', on_delete=models.SET_NULL,
         verbose_name=_('decision-making level')
     )
-    responsible_parties = models.ManyToManyField(
+    responsible_parties = ParentalManyToManyField(
         Organization, through='ActionResponsibleParty', blank=True,
         related_name='responsible_actions', verbose_name=_('responsible parties')
     )
@@ -191,9 +201,20 @@ class Action(ModelWithImage, OrderedModel):
         return self.tasks.exclude(state=ActionTask.CANCELLED).filter(completed_at__isnull=True).count()
     active_task_count.short_description = _('Active tasks')
 
+    panels = [
+        FieldPanel('name'),
+        FieldPanel('description'),
+        AutocompletePanel('responsible_parties', target_model='django_orghierarchy.Organization', is_single=False),
+    ]
 
-class ActionResponsibleParty(OrderedModel):
-    action = models.ForeignKey(Action, on_delete=models.CASCADE, verbose_name=_('action'))
+
+class ActionResponsibleParty(OrderedModel, Orderable):
+    action = models.ForeignKey(
+        'actions.Action',
+        on_delete=models.CASCADE,
+        verbose_name=_('action'),
+        related_name='+'
+    )
     org = models.ForeignKey(
         Organization, on_delete=models.CASCADE, verbose_name=_('organization'),
         limit_choices_to=Q(dissolution_date=None)

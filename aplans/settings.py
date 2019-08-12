@@ -50,6 +50,8 @@ SECRET_KEY = env('SECRET_KEY')
 
 SITE_ID = 1
 
+WAGTAIL_SITE_NAME = 'Aplans Admin'
+
 
 # Application definition
 
@@ -75,6 +77,23 @@ INSTALLED_APPS = [
 
     'django_orghierarchy',
 
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail.core',
+    'wagtail.contrib.modeladmin',
+    'wagtailautocomplete',
+
+    'modelcluster',
+    'taggit',
+
     'users',
     'actions',
     'indicators',
@@ -91,6 +110,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'wagtail.core.middleware.SiteMiddleware',
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'aplans.urls'
