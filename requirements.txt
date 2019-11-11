@@ -34,7 +34,7 @@ django==2.2.6
 djangorestframework==3.10.3
 drf-oidc-auth==0.9        # via django-helusers
 easy-thumbnails==2.6
-ecdsa==0.13.2             # via python-jose
+ecdsa==0.13.3             # via python-jose
 et-xmlfile==1.0.1         # via openpyxl
 future==0.17.1            # via pyjwkest, python-jose
 graphene-django-optimizer==0.6.0
@@ -43,6 +43,7 @@ graphene==2.1.8           # via graphene-django
 graphql-core==2.2.1       # via graphene, graphene-django, graphql-relay
 graphql-relay==2.0.0      # via graphene
 idna==2.8                 # via requests
+importlib-metadata==0.23  # via pluggy, pytest
 inflection==0.3.1
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.8.0
@@ -51,7 +52,7 @@ jedi==0.15.1              # via ipython
 lxml==4.4.1
 markdown==3.1.1
 markuppy==1.14            # via tablib
-more-itertools==7.2.0     # via pytest
+more-itertools==7.2.0     # via pytest, zipp
 oauthlib==3.1.0           # via requests-oauthlib, social-auth-core
 odfpy==1.4.0              # via tablib
 openpyxl==3.0.0           # via tablib
@@ -98,6 +99,7 @@ urllib3==1.25.6           # via requests, sentry-sdk
 wcwidth==0.1.7            # via prompt-toolkit, pytest
 xlrd==1.2.0               # via tablib
 xlwt==1.3.0               # via tablib
+zipp==0.6.0               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools==41.6.0        # via ipython, markdown
