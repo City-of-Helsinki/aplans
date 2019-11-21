@@ -77,3 +77,20 @@ pinned versions for updates.
 To remove a dependency, remove it from `requirements.in`,
 run `pip-compile` and then `pip-sync`. If everything works
 as expected, commit the changes.
+
+
+## Attribution
+
+City of Helsinki would like to request that when this source code is forked
+and deployed to production use for another organization, the following phrases
+would be added to the FAQ or similar section of the user-visible UI, as well as
+to the public presentations or other materials presenting the new service:
+
+> [Name of the service] is an open-source service based on [Helsinki Climate Watch](https://github.com/City-of-Helsinki/cnh-ui),
+> a service developed by the City of Helsinki. Helsinki Climate Watch has
+> received funding from the European Union EIT Climate-KIC programme.
+
+Or in Finnish:
+
+> Palvelu on avointa lähdekoodia ja perustuu alun perin Helsingin kaupungin kehittämään [Helsingin ilmastovahti -palveluun](https://github.com/City-of-Helsinki/cnh-ui).
+> Helsingin ilmastovahti on saanut tukea EU:n Climate-KIC-ohjelmasta.
