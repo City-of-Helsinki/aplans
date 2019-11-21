@@ -82,7 +82,7 @@ as expected, commit the changes.
 ## Attribution
 
 City of Helsinki would like to request that when this source code is forked
-and deployed to production use for another organization, the following phrases
+and/or deployed to production use for another organization, the following phrases
 would be added to the FAQ or similar section of the user-visible UI, as well as
 to the public presentations or other materials presenting the new service:
 
