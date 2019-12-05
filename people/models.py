@@ -115,5 +115,8 @@ class Person(ModelWithImage):
     def get_avatar_url(self, request):
         return self.get_image_url(request)
 
+    def get_notification_context(self):
+        return dict(first_name=self.first_name, last_name=self.last_name)
+
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)

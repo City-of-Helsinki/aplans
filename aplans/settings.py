@@ -26,17 +26,20 @@ env = environ.Env(
     STATIC_URL=(str, '/static/'),
     SENTRY_DSN=(str, ''),
     COOKIE_PREFIX=(str, 'aplans'),
+    SERVER_EMAIL=(str, 'noreply@ilmastovahti.fi'),
     INTERNAL_IPS=(list, []),
     OIDC_ISSUER_URL=(str, ''),
     OIDC_CLIENT_ID=(str, ''),
     OIDC_CLIENT_SECRET=(str, ''),
+    MAILGUN_API_KEY=(str, ''),
+    MAILGUN_SENDER_DOMAIN=(str, ''),
+    MAILGUN_REGION=(str, ''),
 )
 
 BASE_DIR = root()
 
 if os.path.exists(os.path.join(BASE_DIR, '.env')):
     environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
 
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env('ALLOWED_HOSTS')
@@ -65,8 +68,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'social_django',
     'mptt',
+    'parler',
     'django_extensions',
     'import_export',
+    'anymail',
 
     'admin_ordering',
     'ckeditor',
@@ -86,6 +91,7 @@ INSTALLED_APPS = [
     'indicators',
     'content',
     'people',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -226,6 +232,18 @@ LANGUAGES = (
 
 LANGUAGE_CODE = 'fi'
 
+PARLER_LANGUAGES = {
+    None: (
+        {'code': 'fi'},
+        {'code': 'en'},
+    ),
+    'default': {
+        'fallback': 'fi',             # defaults to PARLER_DEFAULT_LANGUAGE_CODE
+        'hide_untranslated': False,   # the default; let .active_translations() return fallbacks too.
+    }
+}
+
+
 TIME_ZONE = 'Europe/Helsinki'
 
 USE_I18N = True
@@ -238,6 +256,18 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale')
 ]
 
+#
+# Email
+#
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ANYMAIL = {}
+
+if env.str('MAILGUN_API_KEY'):
+    EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+    ANYMAIL['MAILGUN_API_KEY'] = env.str('MAILGUN_API_KEY')
+    ANYMAIL['MAILGUN_SENDER_DOMAIN'] = env.str('MAILGUN_SENDER_DOMAIN')
+    if env.str('MAILGUN_REGION'):
+        ANYMAIL['MAILGUN_API_URL'] = 'https://api.%s.mailgun.net/v3' % env.str('MAILGUN_REGION')
 
 # ckeditor for rich-text admin fields
 CKEDITOR_CONFIGS = {

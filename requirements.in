@@ -1,4 +1,4 @@
-django
+django<3.0
 -e git+https://github.com/juyrjola/django-orghierarchy.git#egg=django-orghierarchy
 djangorestframework
 django-helusers
@@ -20,8 +20,6 @@ django-image-cropping
 easy-thumbnails
 Pillow
 sentry-sdk
-pytest-django
-pytest-cov
 graphene-django
 graphene-django-optimizer
 aniso8601
@@ -29,3 +27,6 @@ django-admin-numeric-filter
 django-admin-ordering
 django-admin-autocomplete-filter
 django-import-export
+Jinja2
+django-parler
+django-anymail[mailgun]

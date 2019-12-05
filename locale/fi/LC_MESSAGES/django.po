@@ -790,6 +790,47 @@ msgstr "mittarin yhteyshenkilö"
 msgid "indicator contact persons"
 msgstr "mittarin yhteyshenkilöt"
 
+#: notifications/management/commands/send_notifications.py
+#, fuzzy, python-format
+#| msgid "Task is %(days)d day late (due adue att %(date)s)"
+#| msgid_plural "Task is %(days)d days late (due at %(date)s)"
+msgid "Task is %(days)d day late (due at %(date)s)"
+msgid_plural "Task is %(days)d days late (due at %(date)s)"
+msgstr[0] "Tehtävä on %(days)d päivän myöhässä (tavoitepäivämäärä %(date)s)"
+msgstr[1] "Tehtävä on %(days)d päivää myöhässä (tavoitepäivämäärä %(date)s)"
+
+#: notifications/management/commands/send_notifications.py
+msgid "Task is due tomorrow"
+msgstr ""
+
+#: notifications/management/commands/send_notifications.py
+#, fuzzy, python-format
+#| msgid "Task is %(days)d day late (due adue att %(date)s)"
+#| msgid_plural "Task is %(days)d days late (due at %(date)s)"
+msgid "Task is due in a week (due at %(date)s)"
+msgstr "Tehtävä on %(days)d päivän myöhässä (tavoitepäivämäärä %(date)s)"
+
+#: notifications/management/commands/send_notifications.py
+#, python-format
+msgid "Task deadline is %(days)d day away (due at %(date)s)"
+msgid_plural "Task deadline is %(days)d days away (due at %(date)s)"
+msgstr[0] "Tehtävän tavoitepäivämäärä on huomenna (%(date)s)"
+msgstr[1] "Tehtävän tavoitepäivämäärä on %(days)d päivän päässä (%(date)s)"
+
+#: notifications/management/commands/send_notifications.py
+#, python-format
+msgid "Action doesn't have at least %(count)d in-progress task with due dates within one year"
+msgid_plural "Action doesn't have at least %(count)d in-progress tasks with due dates within one year"
+msgstr[0] ""
+msgstr[1] ""
+
+#: notifications/management/commands/send_notifications.py
+#, python-format
+msgid "Action doesn't have at least %(count)d in-progress task with due dates within %(days)d days"
+msgid_plural "Action doesn't have at least %(count)d in-progress tasks with due dates within %(days)d days"
+msgstr[0] ""
+msgstr[1] ""
+
 #: people/admin.py
 msgid "Is contact person"
 msgstr "On yhteyshenkilö"

@@ -14,6 +14,9 @@ from indicators.models import (
 from content.models import (
     StaticPage, BlogPost, Question, SiteGeneralContent
 )
+from notifications.models import (
+    BaseTemplate, NotificationTemplate, ContentBlock
+)
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from people.models import Person
@@ -119,6 +122,10 @@ PLAN_ADMIN_PERMS = (
     (BlogPost, ALL_PERMS),
     (Question, ALL_PERMS),
     (SiteGeneralContent, ('add', 'view', 'change')),
+
+    (BaseTemplate, ('add', 'view', 'change')),
+    (NotificationTemplate, ALL_PERMS),
+    (ContentBlock, ALL_PERMS),
 
     (User, ('view',))
 )
