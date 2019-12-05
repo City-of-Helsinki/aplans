@@ -4,6 +4,7 @@ from datetime import date
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -129,6 +130,8 @@ class Action(ModelWithImage, OrderedModel):
     updated_at = models.DateTimeField(
         editable=False, verbose_name=_('updated at'), default=timezone.now
     )
+
+    sent_notifications = GenericRelation('notifications.SentNotification', related_query_name='action')
 
     objects = ActionQuerySet.as_manager()
 
@@ -278,6 +281,9 @@ class Action(ModelWithImage, OrderedModel):
             return
         self.save(update_fields=update_fields)
 
+    def get_notification_context(self):
+        return {'identifier': self.identifier, 'name': self.name}
+
     def has_contact_persons(self):
         return self.contact_persons.exists()
     has_contact_persons.short_description = _('Has contact persons')
@@ -415,6 +421,8 @@ class ActionTask(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False, verbose_name=_('created at'))
     modified_at = models.DateTimeField(auto_now=True, editable=False, verbose_name=_('modified at'))
 
+    sent_notifications = GenericRelation('notifications.SentNotification', related_query_name='action_task')
+
     class Meta:
         ordering = ('action', 'due_at')
         verbose_name = _('action task')
@@ -428,6 +436,14 @@ class ActionTask(models.Model):
             raise ValidationError({'completed_at': _('Completed tasks must have a completion date')})
         if self.completed_at is not None and self.completed_at > date.today():
             raise ValidationError({'completed_at': _("Date can't be in the future")})
+
+    def get_notification_context(self):
+        return {
+            'action': self.action.get_notification_context(),
+            'name': self.name,
+            'due_at': self.due_at,
+            'state': self.state
+        }
 
 
 class ActionImpact(OrderedModel):

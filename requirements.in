@@ -1,4 +1,4 @@
-django
+django<3.0
 -e git+https://github.com/juyrjola/django-orghierarchy.git#egg=django-orghierarchy
 djangorestframework
 django-helusers
@@ -29,3 +29,5 @@ django-admin-numeric-filter
 django-admin-ordering
 django-admin-autocomplete-filter
 django-import-export
+Jinja2
+django-parler

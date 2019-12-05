@@ -37,7 +37,6 @@ BASE_DIR = root()
 if os.path.exists(os.path.join(BASE_DIR, '.env')):
     environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 INTERNAL_IPS = env.list('INTERNAL_IPS',
@@ -65,6 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'social_django',
     'mptt',
+    'parler',
     'django_extensions',
     'import_export',
 
@@ -86,6 +86,7 @@ INSTALLED_APPS = [
     'indicators',
     'content',
     'people',
+    'notifications',
 ]
 
 MIDDLEWARE = [
