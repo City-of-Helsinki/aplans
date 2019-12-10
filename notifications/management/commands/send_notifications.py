@@ -1,12 +1,15 @@
 import typing
-from datetime import date, timedelta
+from datetime import date
 from dataclasses import dataclass
 
+from django.core.mail import EmailMessage
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from django.utils.formats import date_format
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import activate, ngettext_lazy, gettext_lazy as _
+from markupsafe import Markup
+
 from actions.models import Plan, ActionTask, Action, ActionContactPerson
 from people.models import Person
 from notifications.models import NotificationType, SentNotification
@@ -229,17 +232,35 @@ class NotificationEngine:
 
         base_template = self.plan.notification_base_template
         templates_by_type = {t.type: t for t in base_template.templates.all()}
-
         for person in self.persons_by_id.values():
+            if 'sonjamaria' not in person.email:
+                continue
+            print('here')
             for ttype, notifications in person._notifications.items():
                 template = templates_by_type.get(ttype)
                 if template is None:
                     print('No template for %s' % ttype)
                     continue
-                context = dict(items=notifications, person=person.get_notification_context())
+
+                cb_qs = base_template.content_blocks.filter(Q(template__isnull=True) | Q(template=template))
+                content_blocks = {cb.identifier: Markup(cb.content) for cb in cb_qs}
+
+                context = {
+                    'items': notifications,
+                    'person': person.get_notification_context(),
+                    'content_blocks': content_blocks,
+                }
                 rendered = template.render(context)
-                print(rendered['html_body'])
-                exit()
+                msg = EmailMessage(
+                    rendered['subject'],
+                    rendered['html_body'],
+                    'Helsingin ilmastovahti <noreply@ilmastovahti.fi>',
+                    ['sonja-maria.ignatius@hel.fi']
+                    #['juha.yrjola@gmail.com']
+                )
+                msg.content_subtype = "html"  # Main content is now text/html
+                msg.send()
+        exit()
 
         """
         actions = sorted(actions_by_id.values(), key=lambda x: x.order)

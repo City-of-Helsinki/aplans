@@ -11,9 +11,6 @@
             if (state !== 'completed') {
                 $el.find('.field-completed_at').hide()
             }
-            if (el.id === 'tasks-empty') {
-                $el.find('.field-state').hide();
-            }
         });
         $('#tasks-group .field-state select').change(function(ev) {
             var $stateEl = $(ev.currentTarget);

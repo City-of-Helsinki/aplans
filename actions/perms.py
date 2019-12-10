@@ -15,7 +15,7 @@ from content.models import (
     StaticPage, BlogPost, Question, SiteGeneralContent
 )
 from notifications.models import (
-    BaseTemplate, NotificationTemplate
+    BaseTemplate, NotificationTemplate, ContentBlock
 )
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -125,6 +125,7 @@ PLAN_ADMIN_PERMS = (
 
     (BaseTemplate, ('add', 'view', 'change')),
     (NotificationTemplate, ALL_PERMS),
+    (ContentBlock, ALL_PERMS),
 
     (User, ('view',))
 )

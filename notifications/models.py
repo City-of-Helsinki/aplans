@@ -4,6 +4,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.utils import translation
+from django.utils.formats import date_format
 from django.utils.translation import ugettext_lazy as _
 from jinja2 import StrictUndefined
 from jinja2.exceptions import TemplateError
@@ -17,6 +19,10 @@ from people.models import Person
 
 DEFAULT_LANG = settings.LANGUAGES[0][0]
 logger = logging.getLogger('aplans.notifications')
+
+
+class NotificationTemplateException(Exception):
+    pass
 
 
 class NotificationType(Enum):
@@ -39,8 +45,21 @@ def notification_type_choice_builder():
         yield (val.identifier, val.verbose_name)
 
 
-class NotificationTemplateException(Exception):
-    pass
+def format_date(dt):
+    current_language = translation.get_language()
+    if current_language == 'fi':
+        dt_format = r'j.n.Y'
+    else:
+        # default to English
+        dt_format = r'j/n/Y'
+
+    return date_format(dt, dt_format)
+
+
+def make_jinja_environment():
+    env = SandboxedEnvironment(trim_blocks=True, lstrip_blocks=True, undefined=StrictUndefined)
+    env.filters['format_date'] = format_date
+    return env
 
 
 class SentNotification(models.Model):
@@ -74,8 +93,8 @@ class BaseTemplate(models.Model):
         return str(self.plan)
 
     def render(self, content):
-        env = SandboxedEnvironment(trim_blocks=True, lstrip_blocks=True, undefined=StrictUndefined)
         context = dict(content=content)
+        env = make_jinja_environment()
         try:
             html = env.from_string(self.html_body).render(context)
         except TemplateError as e:
@@ -111,8 +130,7 @@ class NotificationTemplate(TranslatableModel):
         return 'N/A'
 
     def render(self, context, language_code=DEFAULT_LANG):
-        env = SandboxedEnvironment(trim_blocks=True, lstrip_blocks=True, undefined=StrictUndefined)
-
+        env = make_jinja_environment()
         logger.debug('Rendering template for notification %s' % self.type)
         with switch_language(self, language_code):
             try:
@@ -123,8 +141,35 @@ class NotificationTemplate(TranslatableModel):
             except TemplateError as e:
                 raise NotificationTemplateException(e) from e
 
+        # Include the base template into the body, leave subject as-is
         rendered_notification['html_body'] = self.base.render(rendered_notification['html_body'])
+
         return rendered_notification
 
     def clean(self):
         pass
+
+
+class ContentBlock(TranslatableModel):
+    base = models.ForeignKey(BaseTemplate, on_delete=models.CASCADE, related_name='content_blocks', editable=False)
+    template = models.ForeignKey(
+        NotificationTemplate, null=True, blank=True, on_delete=models.CASCADE, related_name='content_blocks',
+        verbose_name=_('template'), help_text=_('Do not set if content block is used in multiple templates')
+    )
+    identifier = models.CharField(max_length=50, verbose_name=_('identifier'))
+    translations = TranslatedFields(
+        name=models.CharField(
+            verbose_name=_('name'), max_length=100
+        ),
+        content=models.TextField(
+            verbose_name=_('content'), help_text=_('HTML content for the block'),
+        )
+    )
+
+    class Meta:
+        verbose_name = _('content block')
+        verbose_name_plural = _('content blocks')
+        unique_together = (('base', 'template', 'identifier'),)
+
+    def __str__(self):
+        return self.name

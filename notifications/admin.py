@@ -1,9 +1,10 @@
+from ckeditor.widgets import CKEditorWidget
 from django.contrib import admin
-from admin_site.admin import AplansModelAdmin
 from parler.admin import TranslatableAdmin
 from parler.forms import TranslatableModelForm
 
-from .models import BaseTemplate, NotificationTemplate
+from admin_site.admin import AplansModelAdmin
+from .models import BaseTemplate, NotificationTemplate, ContentBlock
 
 
 @admin.register(BaseTemplate)
@@ -48,3 +49,22 @@ class NotificationTemplateAdmin(AplansModelAdmin, TranslatableAdmin):
         plan = request.user.get_active_admin_plan()
         obj.base = plan.notification_base_template
         super().save_model(request, obj, form, change)
+
+
+@admin.register(ContentBlock)
+class ContentBlockAdmin(AplansModelAdmin, TranslatableAdmin):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        plan = request.user.get_active_admin_plan()
+        return qs.filter(base__plan=plan)
+
+    def save_model(self, request, obj, form, change):
+        plan = request.user.get_active_admin_plan()
+        obj.base = plan.notification_base_template
+        super().save_model(request, obj, form, change)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'content' in form.base_fields:
+            form.base_fields['content'].widget = CKEditorWidget(config_name='lite')
+        return form

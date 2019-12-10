@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
@@ -282,7 +283,8 @@ class Action(ModelWithImage, OrderedModel):
         self.save(update_fields=update_fields)
 
     def get_notification_context(self):
-        return {'identifier': self.identifier, 'name': self.name}
+        change_url = reverse('admin:actions_action_change', args=(self.id,))
+        return {'id': self.id, 'identifier': self.identifier, 'name': self.name, 'change_url': change_url}
 
     def has_contact_persons(self):
         return self.contact_persons.exists()
