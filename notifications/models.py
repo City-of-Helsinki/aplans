@@ -75,7 +75,7 @@ class SentNotification(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='notifications')
 
     def __str__(self):
-        return '%s: %s' % (self.action, self.type)
+        return '%s: %s -> %s' % (self.content_object, self.type, self.person)
 
 
 class BaseTemplate(models.Model):
@@ -133,13 +133,13 @@ class NotificationTemplate(TranslatableModel):
         env = make_jinja_environment()
         logger.debug('Rendering template for notification %s' % self.type)
         with switch_language(self, language_code):
-            try:
-                rendered_notification = {
-                    attr: env.from_string(getattr(self, attr)).render(context)
-                    for attr in ('subject', 'html_body')
-                }
-            except TemplateError as e:
-                raise NotificationTemplateException(e) from e
+            rendered_notification = {}
+            for attr in ('subject', 'html_body'):
+                try:
+                    rendered_notification[attr] = \
+                        env.from_string(getattr(self, attr)).render(context)
+                except TemplateError as e:
+                    raise NotificationTemplateException(e) from e
 
         # Include the base template into the body, leave subject as-is
         rendered_notification['html_body'] = self.base.render(rendered_notification['html_body'])

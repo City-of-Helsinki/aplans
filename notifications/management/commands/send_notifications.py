@@ -1,5 +1,5 @@
 import typing
-from datetime import date
+from datetime import date, timedelta
 from dataclasses import dataclass
 
 from django.core.mail import EmailMessage
@@ -7,12 +7,12 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.translation import activate, ngettext_lazy, gettext_lazy as _
+from django.utils.translation import activate
 from markupsafe import Markup
 
 from actions.models import Plan, ActionTask, Action, ActionContactPerson
 from people.models import Person
-from notifications.models import NotificationType, SentNotification
+from notifications.models import NotificationType
 
 
 MINIMUM_NOTIFICATION_PERIOD = 5  # days
@@ -34,15 +34,21 @@ class NotificationEmail:
 class Notification:
     type: NotificationType
     plan: Plan
-
-    def __init__(self):
-        self.notifications = []
+    obj: typing.Union[Action, ActionTask]
 
     def _get_type(self):
         return self.type.identifier
 
-    def notification_last_sent(self, obj: typing.Union[Action, ActionTask], person: Person) -> typing.Optional[int]:
-        last_notification = obj.sent_notifications.filter(
+    def get_context(self):
+        # Implement in subclass
+        raise NotImplementedError()
+
+    def mark_sent(self, person: Person):
+        now = timezone.now()
+        self.obj.sent_notifications.create(sent_at=now, person=person, type=self._get_type())
+
+    def notification_last_sent(self, person: Person) -> typing.Optional[int]:
+        last_notification = self.obj.sent_notifications.filter(
             person=person, type=self._get_type()
         ).order_by('-sent_at').first()
         if not last_notification:
@@ -51,7 +57,7 @@ class Notification:
             return (timezone.now() - last_notification.sent_at).days
 
     def _queue_notification(self, person: Person):
-        person._notifications.setdefault(self._get_type(), []).append(self._get_context())
+        person._notifications.setdefault(self._get_type(), []).append(self)
 
 
 class TaskLateNotification(Notification):
@@ -59,15 +65,15 @@ class TaskLateNotification(Notification):
 
     def __init__(self, task: ActionTask, days_late: int):
         super().__init__()
-        self.task = task
+        self.obj = task
         self.days_late = days_late
 
-    def _get_context(self):
-        return dict(task=self.task.get_notification_context(), days_late=self.days_late)
+    def get_context(self):
+        return dict(task=self.obj.get_notification_context(), days_late=self.days_late)
 
     def generate_notifications(self, action_contacts: typing.List[Person]):
         for person in action_contacts:
-            days = self.notification_last_sent(self.task, person)
+            days = self.notification_last_sent(person)
             if days is not None:
                 if days < MINIMUM_NOTIFICATION_PERIOD:
                     # We don't want to remind too often
@@ -98,15 +104,15 @@ class TaskDueSoonNotification(Notification):
     type = NotificationType.TASK_DUE_SOON
 
     def __init__(self, task: ActionTask, days_left: int):
-        self.task = task
+        self.obj = task
         self.days_left = days_left
 
-    def _get_context(self):
-        return dict(task=self.task.get_notification_context(), days_left=self.days_left)
+    def get_context(self):
+        return dict(task=self.obj.get_notification_context(), days_left=self.days_left)
 
     def generate_notifications(self, action_contacts: typing.List[Person]):
         for person in action_contacts:
-            days = self.notification_last_sent(self.task, person)
+            days = self.notification_last_sent(person)
             if days is not None:
                 if days < MINIMUM_NOTIFICATION_PERIOD:
                     # We don't want to remind too often
@@ -138,6 +144,31 @@ class TaskDueSoonNotification(Notification):
             return
         return TaskNotification(task, notif_type, msg)
         """
+
+
+class NotEnoughTasksNotification(Notification):
+    type = NotificationType.NOT_ENOUGH_TASKS
+
+    def __init__(self, action: Action):
+        self.obj = action
+
+    def get_context(self):
+        return dict(action=self.obj.get_notification_context())
+
+    def generate_notifications(self):
+        contacts = self.obj._contact_persons
+        for person in contacts:
+            days_since = self.notification_last_sent(person)
+            if days_since is not None:
+                if days_since < 30:
+                    # We don't want to remind too often
+                    continue
+
+            self._queue_notification(person)
+
+
+class ActionNotUpdatedNotification(Notification):
+    pass
 
 
 class NotificationEngine:
@@ -203,20 +234,13 @@ class NotificationEngine:
             if diff <= N_DAYS:
                 count += 1
         if count < TASK_COUNT:
-            if N_DAYS == 365:
-                msg = ngettext_lazy(
-                    "Action doesn't have at least %(count)d in-progress task with due dates within one year",
-                    "Action doesn't have at least %(count)d in-progress tasks with due dates within one year",
-                    'count'
-                )
-            else:
-                msg = ngettext_lazy(
-                    "Action doesn't have at least %(count)d in-progress task with due dates within %(days)d days",
-                    "Action doesn't have at least %(count)d in-progress tasks with due dates within %(days)d days",
-                    'count'
-                )
-            notif_type = NotificationType.NOT_ENOUGH_TASKS
-            return ActionNotification(action, notif_type, msg % {'count': TASK_COUNT, 'days': N_DAYS})
+            notif = NotEnoughTasksNotification(action)
+            notif.generate_notifications()
+
+        if action.updated_at.date() - today >= timedelta(days=3 * 30):
+            notif = ActionNotUpdatedNotification(action)
+            notif.generate_notifications()
+
         return
 
     def generate_notifications(self):
@@ -230,13 +254,17 @@ class NotificationEngine:
         for task in self.active_tasks:
             self.generate_task_notifications(task)
 
+        for action in self.actions_by_id.values():
+            if action.status.is_completed:
+                continue
+            self.make_action_notifications(action)
+
         base_template = self.plan.notification_base_template
         templates_by_type = {t.type: t for t in base_template.templates.all()}
         for person in self.persons_by_id.values():
-            if 'sonjamaria' not in person.email:
-                continue
-            print('here')
             for ttype, notifications in person._notifications.items():
+                if ttype != 'not_enough_tasks':
+                    continue
                 template = templates_by_type.get(ttype)
                 if template is None:
                     print('No template for %s' % ttype)
@@ -246,7 +274,7 @@ class NotificationEngine:
                 content_blocks = {cb.identifier: Markup(cb.content) for cb in cb_qs}
 
                 context = {
-                    'items': notifications,
+                    'items': [x.get_context() for x in notifications],
                     'person': person.get_notification_context(),
                     'content_blocks': content_blocks,
                 }
@@ -255,11 +283,18 @@ class NotificationEngine:
                     rendered['subject'],
                     rendered['html_body'],
                     'Helsingin ilmastovahti <noreply@ilmastovahti.fi>',
-                    ['sonja-maria.ignatius@hel.fi']
-                    #['juha.yrjola@gmail.com']
+                    # ['sonja-maria.ignatius@hel.fi']
+                    ['juha.yrjola@gmail.com']
                 )
                 msg.content_subtype = "html"  # Main content is now text/html
-                msg.send()
+                print('sending %s to %s' % (rendered['subject'], person))
+                for n in notifications:
+                    print('\t%s' % n.obj)
+
+                # msg.send()
+                for n in notifications:
+                    n.mark_sent(person)
+
         exit()
 
         """
