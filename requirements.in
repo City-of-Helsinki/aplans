@@ -1,4 +1,4 @@
-django<3.0
+django<4.0
 -e git+https://github.com/juyrjola/django-orghierarchy.git#egg=django-orghierarchy
 djangorestframework
 django-helusers
