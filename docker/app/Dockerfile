@@ -36,4 +36,4 @@ RUN ./manage.py compilemessages
 COPY ./docker/app/docker-entrypoint.sh /
 COPY ./docker/app/wait-for-it.sh /
 
-ENTRYPOINT ["/bin/bash", "/docker-entrypoint.sh"]
+CMD ["/bin/bash", "/docker-entrypoint.sh"]

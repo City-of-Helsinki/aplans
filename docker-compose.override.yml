@@ -1,0 +1,12 @@
+# Development configuration file
+#
+# This file is automatically merged with docker-compose.yml
+# when 'docker-compose up' is run.
+
+version: '3.2'
+services:
+  app:
+    volumes:
+      - .:/code
+    environment:
+      - DATABASE_URL=postgres://aplans@db/aplans

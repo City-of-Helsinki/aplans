@@ -1,0 +1,15 @@
+# Production configuration file
+#
+# To apply this configuration, run:
+# docker-compose -f docker-compose.yml -f docker-compose.production.yml up
+
+version: '3.2'
+services:
+  db:
+    restart: always
+
+  app:
+    build:
+      cache_from:
+        - ${DOCKER_CACHE_IMAGE:-aplans_app}
+    restart: always
