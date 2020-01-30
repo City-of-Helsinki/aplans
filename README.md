@@ -45,10 +45,30 @@ Compile the translation files:
 python manage.py compilemessages
 ```
 
+#### Docker
+
+You can also use Docker in development. Start server in `http://localhost:8000` by running:
+
+```shell
+docker-compose up
+```
+
+To run Django commands:
+
+```shell
+docker-compose run app python manage.py <command>
+```
+
 ### Production
 
 The project is containerized using Docker Compose. You will still need to set some
 variables in your environment; see the first few lines in `aplans/settings.py`.
+
+Use this command to apply the production configuration `docker-compose.production.yml`:
+
+```shell
+docker-compose -f docker-compose.yml -f docker-compose.production.yml up
+```
 
 ## Contributing
 
