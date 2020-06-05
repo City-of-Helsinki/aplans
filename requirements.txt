@@ -6,7 +6,7 @@
 #
 -e git+https://github.com/juyrjola/django-orghierarchy.git#egg=django-orghierarchy
 -e git+https://github.com/juyrjola/graphene-django-optimizer.git#egg=graphene-django-optimizer
-aniso8601==7.0.0
+aniso8601==7.0.0          # via -r requirements.in, graphene
 attrs==19.3.0             # via pytest
 backcall==0.1.0           # via ipython
 certifi==2019.11.28       # via requests, sentry-sdk
@@ -15,43 +15,43 @@ coverage==5.0.2           # via pytest-cov
 decorator==4.4.1          # via ipython, traitlets
 defusedxml==0.6.0         # via odfpy, python3-openid, social-auth-core
 diff-match-patch==20181111  # via django-import-export
-django-admin-autocomplete-filter==0.4
-django-admin-numeric-filter==0.1.6
-django-admin-ordering==0.12.0
-django-anymail[mailgun]==7.0.0
+django-admin-autocomplete-filter==0.4  # via -r requirements.in
+django-admin-numeric-filter==0.1.6  # via -r requirements.in
+django-admin-ordering==0.12.0  # via -r requirements.in
+django-anymail[mailgun]==7.0.0  # via -r requirements.in
 django-appconf==1.0.3     # via django-image-cropping
-django-ckeditor==5.8.0
-django-cors-headers==3.2.1
-django-environ==0.4.5
-django-extensions==2.2.5
-django-filter==2.2.0
-django-helusers==0.5.2
-django-image-cropping==1.3.0
-django-import-export==2.0
+django-ckeditor==5.8.0    # via -r requirements.in
+django-cors-headers==3.2.1  # via -r requirements.in
+django-environ==0.4.5     # via -r requirements.in
+django-extensions==2.2.5  # via -r requirements.in
+django-filter==2.2.0      # via -r requirements.in
+django-helusers==0.5.2    # via -r requirements.in
+django-image-cropping==1.3.0  # via -r requirements.in
+django-import-export==2.0  # via -r requirements.in
 django-js-asset==1.2.2    # via django-admin-ordering, django-ckeditor, django-mptt
-django-mptt==0.10.0
-django-parler==2.0.1
-django-reversion==3.0.5
-django==2.2.9
-djangorestframework==3.11.0
+django-mptt==0.10.0       # via django-orghierarchy
+django-parler==2.0.1      # via -r requirements.in
+django-reversion==3.0.5   # via -r requirements.in
+django==2.2.13            # via -r requirements.in, django-admin-autocomplete-filter, django-admin-numeric-filter, django-anymail, django-appconf, django-cors-headers, django-filter, django-helusers, django-import-export, django-mptt, django-reversion, djangorestframework, drf-oidc-auth, easy-thumbnails, graphene-django
+djangorestframework==3.11.0  # via -r requirements.in, django-orghierarchy, drf-oidc-auth
 drf-oidc-auth==0.9        # via django-helusers
-easy-thumbnails==2.7
+easy-thumbnails==2.7      # via -r requirements.in
 ecdsa==0.15               # via python-jose
 et-xmlfile==1.0.1         # via openpyxl
 future==0.18.2            # via pyjwkest
-graphene-django==2.8.0
+graphene-django==2.8.0    # via -r requirements.in
 graphene==2.1.8           # via graphene-django
 graphql-core==2.2.1       # via graphene, graphene-django, graphql-relay
 graphql-relay==2.0.1      # via graphene
 idna==2.8                 # via requests
 ipython-genutils==0.2.0   # via traitlets
-ipython==7.11.1
+ipython==7.11.1           # via -r requirements.in
 jdcal==1.4.1              # via openpyxl
 jedi==0.15.2              # via ipython
-jinja2==2.10.3
-libvoikko==4.3
-lxml==4.4.2
-markdown==3.1.1
+jinja2==2.10.3            # via -r requirements.in
+libvoikko==4.3            # via -r requirements.in
+lxml==4.4.2               # via -r requirements.in
+markdown==3.1.1           # via -r requirements.in
 markuppy==1.14            # via tablib
 markupsafe==1.1.1         # via jinja2
 more-itertools==8.0.2     # via pytest
@@ -62,12 +62,12 @@ packaging==20.0           # via pytest
 parso==0.5.2              # via jedi
 pexpect==4.7.0            # via ipython
 pickleshare==0.7.5        # via ipython
-pillow==7.0.0
-plotly==4.4.1
+pillow==7.0.0             # via -r requirements.in, easy-thumbnails
+plotly==4.4.1             # via -r requirements.in
 pluggy==0.13.1            # via pytest
 promise==2.3              # via graphene-django, graphql-core, graphql-relay
 prompt-toolkit==3.0.2     # via ipython
-psycopg2-binary==2.8.4
+psycopg2-binary==2.8.4    # via -r requirements.in
 ptyprocess==0.6.0         # via pexpect
 py==1.8.1                 # via pytest
 pyasn1==0.4.8             # via python-jose, rsa
@@ -76,25 +76,25 @@ pygments==2.5.2           # via ipython
 pyjwkest==1.4.2           # via drf-oidc-auth
 pyjwt==1.7.1              # via social-auth-core
 pyparsing==2.4.6          # via packaging
-pytest-cov==2.8.1
-pytest-django==3.7.0
+pytest-cov==2.8.1         # via -r requirements.in
+pytest-django==3.7.0      # via -r requirements.in
 pytest==5.3.2             # via pytest-cov, pytest-django
-python-jose==3.1.0
+python-jose==3.1.0        # via -r requirements.in, django-helusers
 python3-openid==3.1.0     # via social-auth-core
 pytz==2019.3              # via django
 pyyaml==5.3               # via tablib
 requests-oauthlib==1.3.0  # via social-auth-core
-requests==2.22.0          # via django-anymail, django-helusers, pyjwkest, requests-oauthlib, social-auth-core
+requests==2.22.0          # via django-anymail, django-helusers, django-orghierarchy, pyjwkest, requests-oauthlib, social-auth-core
 retrying==1.3.3           # via plotly
 rsa==4.0                  # via python-jose
 rx==1.6.1                 # via graphql-core
-sentry-sdk==0.13.5
+sentry-sdk==0.13.5        # via -r requirements.in
 singledispatch==3.4.0.3   # via graphene-django
 six==1.13.0               # via django-anymail, django-appconf, django-extensions, django-parler, ecdsa, graphene, graphene-django, graphql-core, graphql-relay, packaging, plotly, promise, pyjwkest, python-jose, retrying, singledispatch, social-auth-app-django, social-auth-core, traitlets
-social-auth-app-django==3.1.0
+social-auth-app-django==3.1.0  # via -r requirements.in
 social-auth-core==3.2.0   # via social-auth-app-django
 sqlparse==0.3.0           # via django
-swapper==1.1.1
+swapper==1.1.1            # via django-orghierarchy
 tablib==0.14.0            # via django-import-export
 traitlets==4.3.3          # via ipython
 urllib3==1.25.7           # via requests, sentry-sdk
@@ -103,4 +103,4 @@ xlrd==1.2.0               # via tablib
 xlwt==1.3.0               # via tablib
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==44.0.0        # via ipython, markdown
+# setuptools
